@@ -37,3 +37,5 @@ Thumbs.db
 # local runtime data
 backend/uploads/
 backend/.npm-cache/
+**/.npm-cache/
+mobile/.git.localbackup/

@@ -1,0 +1,54 @@
+﻿{
+  "expo": {
+    "name": "Mittagstisch Finder",
+    "slug": "mittagstisch-finder",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon33.jpeg",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "icon": "./assets/icon33.jpeg",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wir nutzen deinen Standort, um Angebote in deiner Nähe zu zeigen.",
+        "NSPhotoLibraryUsageDescription": "Wir brauchen Zugriff auf Fotos, um Gerichte hochzuladen.",
+        "NSCameraUsageDescription": "Wir brauchen Zugriff auf die Kamera, um Gerichte zu fotografieren."
+      }
+    },
+    "android": {
+      "icon": "./assets/icon33.jpeg",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-location",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Erlaubt das Auswählen von Fotos für deine Angebote.",
+          "cameraPermission": "Erlaubt das Fotografieren von Gerichten."
+        }
+      ]
+    ]
+  }
+}
+
