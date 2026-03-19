@@ -5,6 +5,7 @@ node_modules/
 # builds
 dist/
 **/dist/
+mobile/dist-web/
 dist-web-check*/
 mobile/dist-web-check*/
 
@@ -19,7 +20,7 @@ mobile/.expo/
 **/.env
 **/.env.*
 !.env.example
-**/.env.example
+!**/.env.example
 
 # logs
 *.log
