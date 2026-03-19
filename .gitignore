@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# builds
+dist/
+**/dist/
+dist-web-check*/
+mobile/dist-web-check*/
+
+# Expo / React Native
+.expo/
+mobile/.expo/
+.expo-shared/
+
+# env / secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+**/.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# local runtime data
+backend/uploads/
+backend/.npm-cache/

@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e05a2b" />
+  <meta name="description" content="Mittagstisch-Feed für Nutzer" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="apple-touch-icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="stylesheet" href="assets/app.css" />
+  <title>Nutzerbereich - Mittagstisch Finder</title>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="assets/icons/Icon33.jpeg" alt="Mittagstisch Finder Icon" />
+        </div>
+        <span>Nutzerbereich</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">Dein Feed</h2>
+    <div class="form-panel">
+      <form data-zip-form>
+        <div class="field">
+          <label for="postal">Postleitzahl</label>
+          <div class="input-row">
+            <input id="postal" name="postal" type="text" placeholder="z.B. 88212" inputmode="numeric" pattern="\d{5}" maxlength="5" data-zip-input required />
+            <button class="button" type="submit">Suchen</button>
+          </div>
+        </div>
+        <div class="input-row">
+          <label class="tag">
+            <input type="checkbox" data-filter="vegan" /> vegan
+          </label>
+          <label class="tag gold">
+            <input type="checkbox" data-filter="vegetarian" /> vegetarisch
+          </label>
+        </div>
+      </form>
+      <div class="notice subtle" data-status></div>
+      <div class="notice warn hidden" data-banner></div>
+      <button class="button ghost" type="button" data-seed>Demo-Angebote laden</button>
+    </div>
+
+    <div class="feed" data-feed></div>
+
+    <div class="footer-cta">
+      <a class="button ghost" href="restaurant.html">Restaurant anmelden</a>
+      <span class="footer-text">Nur für Restaurants: Angebote erstellen und online stellen.</span>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script src="assets/user.js"></script>
+</body>
+</html>
+

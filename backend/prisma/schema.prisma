@@ -1,0 +1,105 @@
+// Prisma schema for Mittagstisch
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Tag {
+  vegan
+  vegetarian
+  classic
+}
+
+enum MealSlot {
+  breakfast
+  lunch
+  dinner
+}
+
+enum RestaurantApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum FulfillmentType {
+  pickup
+  dinein
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  cancelled
+}
+
+model Restaurant {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  phone        String
+  address      String
+  postalCode   String
+  lat          Float
+  lng          Float
+  mealSlots    MealSlot[] @default([lunch])
+  approvalStatus RestaurantApprovalStatus @default(pending)
+  approvalRequestedAt DateTime @default(now())
+  approvalReviewedAt DateTime?
+  approvalNote  String?
+  menuUrl      String?
+  menuMimeType String?
+  passwordHash String
+  createdAt    DateTime   @default(now())
+
+  offers       Offer[]
+  orders       Order[]
+}
+
+model Offer {
+  id              String     @id @default(uuid())
+  restaurantId    String
+  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  title           String
+  description     String
+  price           Decimal   @db.Decimal(10, 2)
+  tags            Tag[]
+  imageUrl        String?
+  mealSlot        MealSlot  @default(lunch)
+  active          Boolean   @default(true)
+  preorderEnabled Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  orders          Order[]
+
+  @@index([restaurantId])
+}
+
+model Order {
+  id              String          @id @default(uuid())
+  offerId         String
+  offer           Offer           @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  restaurantId    String
+  restaurant      Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customerName    String
+  customerEmail   String
+  quantity        Int
+  pickupTime      DateTime
+  fulfillmentType FulfillmentType
+  deviceId        String?
+  requestIp       String?
+  status          OrderStatus     @default(pending)
+  createdAt       DateTime        @default(now())
+
+  @@index([restaurantId])
+  @@index([offerId])
+  @@index([restaurantId, customerEmail])
+  @@index([restaurantId, deviceId])
+}

@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e05a2b" />
+  <meta name="description" content="Restaurant Angebote erstellen" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="apple-touch-icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="stylesheet" href="assets/app.css" />
+  <title>Restaurant Seite - Mittagstisch Finder</title>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="assets/icons/Icon33.jpeg" alt="Mittagstisch Finder Icon" />
+        </div>
+        <span>Restaurant Seite</span>
+      </div>
+      <div class="nav-links">
+        <a class="nav-pill" href="index.html">Start</a>
+        <a class="nav-pill" href="admin.html">Admin</a>
+      </div>
+    </div>
+
+    <h2 class="section-title">Restaurant-Login</h2>
+    <div class="form-panel" data-login-panel>
+      <form data-login-form>
+        <div class="field">
+          <label for="loginEmail">E-Mail</label>
+          <input id="loginEmail" name="loginEmail" type="email" placeholder="demo@mittagstisch.de" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Passwort</label>
+          <input id="loginPassword" name="loginPassword" type="password" placeholder="mittag123" required />
+        </div>
+        <div class="input-row">
+          <button class="button" type="submit">Anmelden</button>
+          <button class="button ghost" type="button" data-demo-login>Demo-Login</button>
+        </div>
+      </form>
+      <div class="notice subtle">
+        Demo Zugang: <strong>demo@mittagstisch.de</strong> | <strong>mittag123</strong>
+      </div>
+      <div class="notice warn hidden" data-login-error></div>
+    </div>
+
+    <div data-restaurant-content class="hidden">
+      <h2 class="section-title">Restaurant Anmeldung</h2>
+      <div class="form-panel">
+        <form data-profile-form>
+          <div class="field">
+            <label for="restaurantName">Restaurant Name</label>
+            <input id="restaurantName" name="restaurantName" type="text" placeholder="z.B. Stadtgarten" required />
+          </div>
+          <div class="field">
+            <label for="email">E-Mail</label>
+            <input id="email" name="email" type="email" placeholder="name@restaurant.de" required />
+          </div>
+          <button class="button" type="submit">Profil speichern</button>
+        </form>
+        <div class="notice subtle">Demo: Daten werden lokal im Browser gespeichert.</div>
+      </div>
+
+      <h2 class="section-title">Standort</h2>
+      <div class="form-panel">
+        <div class="input-row">
+          <button class="button" type="button" data-location>Standort vom Gerät holen</button>
+          <div class="notice subtle" data-location-status></div>
+        </div>
+        <div class="notice subtle">Oder gib eine Postleitzahl beim Angebot ein. Die App versucht dann automatisch zu geocodieren.</div>
+      </div>
+
+      <h2 class="section-title">Neues Angebot</h2>
+      <div class="form-panel">
+        <form data-offer-form>
+          <div class="field">
+            <label for="restaurant">Restaurant</label>
+            <input id="restaurant" name="restaurant" type="text" placeholder="Restaurant Name" required />
+          </div>
+          <div class="field">
+            <label for="postalCode">Postleitzahl</label>
+            <input id="postalCode" name="postalCode" type="text" placeholder="z.B. 88212" inputmode="numeric" pattern="\d{5}" maxlength="5" />
+          </div>
+          <div class="field">
+            <label for="title">Gericht / Angebot</label>
+            <input id="title" name="title" type="text" placeholder="z.B. Gemüse Curry" required />
+          </div>
+          <div class="field">
+            <label for="price">Preis (EUR)</label>
+            <input id="price" name="price" type="number" step="0.1" min="0" placeholder="9.90" required />
+          </div>
+          <div class="field">
+            <label for="description">Kurzbeschreibung</label>
+            <textarea id="description" name="description" placeholder="Kurze Beschreibung" required></textarea>
+          </div>
+          <div class="input-row">
+            <label class="tag">
+              <input type="checkbox" name="vegan" /> vegan
+            </label>
+            <label class="tag gold">
+              <input type="checkbox" name="vegetarian" /> vegetarisch
+            </label>
+          </div>
+          <div class="field">
+            <label for="image">Bild (optional)</label>
+            <input id="image" name="image" type="file" accept="image/*" data-image-input />
+          </div>
+          <img class="image-preview hidden" alt="Vorschau" data-image-preview />
+          <button class="button" type="submit">Angebot online stellen</button>
+        </form>
+        <div class="notice warn hidden" data-offer-status></div>
+      </div>
+
+      <h2 class="section-title">Meine Angebote</h2>
+      <div class="list" data-offer-list></div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script src="assets/restaurant.js"></script>
+</body>
+</html>
+

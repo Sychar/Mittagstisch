@@ -1,0 +1,23 @@
+﻿{
+  "name": "Mittagstisch Finder",
+  "short_name": "Mittagstisch",
+  "start_url": "./user.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8efe0",
+  "theme_color": "#e05a2b",
+  "icons": [
+    {
+      "src": "assets/icons/Icon33.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/Icon33.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

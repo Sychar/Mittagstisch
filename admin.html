@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#00BCD4" />
+  <meta name="description" content="Admin-Bereich für Restaurant-Freischaltungen" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="apple-touch-icon" href="assets/icons/Icon33.jpeg" />
+  <link rel="stylesheet" href="assets/app.css" />
+  <title>Admin - Mittagstisch Finder</title>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="assets/icons/Icon33.jpeg" alt="Mittagstisch Finder Icon" />
+        </div>
+        <span>Admin Bereich</span>
+      </div>
+      <div class="nav-links">
+        <a class="nav-pill" href="index.html">Start</a>
+        <a class="nav-pill" href="restaurant.html">Restaurant</a>
+      </div>
+    </div>
+
+    <h2 class="section-title">Admin Login</h2>
+    <div class="form-panel" data-admin-login-panel>
+      <form data-admin-login-form>
+        <div class="field">
+          <label for="apiBase">Backend URL</label>
+          <input id="apiBase" name="apiBase" type="text" placeholder="http://localhost:4000" required />
+        </div>
+        <div class="field">
+          <label for="adminEmail">E-Mail</label>
+          <input id="adminEmail" name="adminEmail" type="email" placeholder="admin@mittagstisch.de" required />
+        </div>
+        <div class="field">
+          <label for="adminPassword">Passwort</label>
+          <input id="adminPassword" name="adminPassword" type="password" placeholder="admin123" required />
+        </div>
+        <button class="button" type="submit">Als Admin einloggen</button>
+      </form>
+      <div class="notice subtle">Standard Demo Admin: admin@mittagstisch.de / admin123</div>
+      <div class="notice warn hidden" data-admin-login-error></div>
+    </div>
+
+    <div class="hidden" data-admin-content>
+      <h2 class="section-title">Freischaltungsanfragen</h2>
+      <div class="form-panel admin-toolbar">
+        <div class="field">
+          <label for="statusFilter">Status</label>
+          <select id="statusFilter" data-admin-status-filter>
+            <option value="pending">Wartend</option>
+            <option value="approved">Freigeschaltet</option>
+            <option value="rejected">Abgelehnt</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <button class="button" type="button" data-admin-refresh>Aktualisieren</button>
+          <button class="button ghost" type="button" data-admin-logout>Abmelden</button>
+        </div>
+      </div>
+
+      <div class="notice subtle" data-admin-status>Bitte Status auswählen.</div>
+      <div class="notice warn hidden" data-admin-error></div>
+      <div class="list" data-admin-request-list></div>
+    </div>
+  </div>
+
+  <script src="assets/admin.js"></script>
+</body>
+</html>
+
