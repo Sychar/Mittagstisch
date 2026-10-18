@@ -51,10 +51,15 @@ export const buildApp = async () => {
 
   app.setErrorHandler((error, request, reply) => {
     if (error instanceof HttpError) {
+      const diagnosticId =
+        error.details && typeof error.details === "object"
+          ? String((error.details as Record<string, unknown>).diagnosticId || "").trim()
+          : "";
       reply.status(error.status).send({
         error: error.code,
         message: error.message,
-        details: error.details
+        details: error.details,
+        ...(diagnosticId ? { diagnosticId } : {})
       });
       return;
     }

@@ -30,6 +30,15 @@ export const registerOfferRoutes = (app: FastifyInstance, ctx: AppContext) => {
     }
   });
 
+  app.get("/api/offers/:id/public", async (request) => {
+    const { id } = request.params as { id: string };
+    const result = await ctx.offerService.getPublicOfferWithRestaurant(id);
+    if (!result) {
+      throw new HttpError(404, "NOT_FOUND", "Offer not found");
+    }
+    return result;
+  });
+
   app.get("/api/offers/:id", async (request) => {
     const query = parseOrThrow(offerDetailQuerySchema, request.query);
     const { id } = request.params as { id: string };
@@ -47,4 +56,5 @@ export const registerOfferRoutes = (app: FastifyInstance, ctx: AppContext) => {
       throw error;
     }
   });
+
 };

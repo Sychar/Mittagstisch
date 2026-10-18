@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'mittagstisch-v1';
+﻿const CACHE_NAME = 'nahundfein-v6-20260504-copyright';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const CORE_ASSETS = [
   './assets/user.js',
   './assets/restaurant.js',
   './manifest.json',
+  './copyright/index.html',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/Logo.png',
@@ -18,7 +19,10 @@ const CORE_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(CORE_ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -30,7 +34,7 @@ self.addEventListener('activate', (event) => {
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
 });
 
@@ -40,6 +44,24 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
   if (url.origin !== self.location.origin) return;
+
+  // Keep navigations fresh so homepage updates are visible immediately.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match('./index.html'))
+        )
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {

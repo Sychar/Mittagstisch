@@ -79,16 +79,16 @@ export class PrismaRestaurantRepo implements RestaurantRepo {
   async updateMenu(
     id: string,
     patch: {
-      menuUrl?: string;
-      menuMimeType?: string;
+      menuUrl?: string | null;
+      menuMimeType?: string | null;
     }
   ): Promise<Restaurant | undefined> {
     try {
       const row = await this.prisma.restaurant.update({
         where: { id },
         data: {
-          menuUrl: patch.menuUrl,
-          menuMimeType: patch.menuMimeType
+          menuUrl: patch.menuUrl === null ? null : patch.menuUrl,
+          menuMimeType: patch.menuMimeType === null ? null : patch.menuMimeType
         }
       });
       return toRestaurant(row);
@@ -103,6 +103,53 @@ export class PrismaRestaurantRepo implements RestaurantRepo {
         where: { id },
         data: {
           mealSlots
+        }
+      });
+      return toRestaurant(row);
+    } catch {
+      return undefined;
+    }
+  }
+
+  async updateProfile(
+    id: string,
+    patch: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      postalCode?: string;
+      lat?: number;
+      lng?: number;
+      mealSlots?: MealSlot[];
+    }
+  ): Promise<Restaurant | undefined> {
+    try {
+      const row = await this.prisma.restaurant.update({
+        where: { id },
+        data: {
+          name: patch.name,
+          email: patch.email,
+          phone: patch.phone,
+          address: patch.address,
+          postalCode: patch.postalCode,
+          lat: patch.lat,
+          lng: patch.lng,
+          mealSlots: patch.mealSlots
+        }
+      });
+      return toRestaurant(row);
+    } catch {
+      return undefined;
+    }
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<Restaurant | undefined> {
+    try {
+      const row = await this.prisma.restaurant.update({
+        where: { id },
+        data: {
+          passwordHash
         }
       });
       return toRestaurant(row);

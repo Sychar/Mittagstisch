@@ -1,10 +1,10 @@
-﻿{
+{
   "expo": {
-    "name": "Mittagstisch Finder",
+    "name": "Nah&Fein",
     "slug": "mittagstisch-finder",
-    "version": "0.1.0",
+    "version": "1.0.7",
     "orientation": "portrait",
-    "icon": "./assets/icon33.jpeg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -13,21 +13,35 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "icon": "./assets/icon33.jpeg",
+      "icon": "./assets/icon.png",
+      "bundleIdentifier": "jetzt.mymittagstisch.app",
+      "buildNumber": "45",
+      "associatedDomains": [
+        "applinks:app.nahundfein.com"
+      ],
       "supportsTablet": true,
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Wir nutzen deinen Standort, um Angebote in deiner Nähe zu zeigen.",
         "NSPhotoLibraryUsageDescription": "Wir brauchen Zugriff auf Fotos, um Gerichte hochzuladen.",
         "NSCameraUsageDescription": "Wir brauchen Zugriff auf die Kamera, um Gerichte zu fotografieren."
       }
     },
     "android": {
-      "icon": "./assets/icon33.jpeg",
+      "package": "jetzt.mymittagstisch.app",
+      "versionCode": 16,
+      "icon": "./assets/icon.png",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "READ_MEDIA_IMAGES",
-        "READ_EXTERNAL_STORAGE"
+        "POST_NOTIFICATIONS"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -41,14 +55,27 @@
     "plugins": [
       "expo-font",
       "expo-location",
+      "expo-notifications",
       [
         "expo-image-picker",
         {
           "photosPermission": "Erlaubt das Auswählen von Fotos für deine Angebote.",
           "cameraPermission": "Erlaubt das Fotografieren von Gerichten."
         }
-      ]
-    ]
+      ],
+      "@react-native-community/datetimepicker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9502473e-6156-4560-8cc5-3639e4ca6f71"
+      }
+    },
+    "owner": "sychar",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9502473e-6156-4560-8cc5-3639e4ca6f71"
+    }
   }
 }
-

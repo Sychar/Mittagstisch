@@ -13,6 +13,8 @@ enum Tag {
   vegan
   vegetarian
   classic
+  coffee
+  icecream
 }
 
 enum MealSlot {
@@ -38,6 +40,55 @@ enum OrderStatus {
   cancelled
 }
 
+enum EventTag {
+  sport
+  culture
+  music
+  party
+  trip
+  family
+  market
+  workshop
+  cinema
+  other
+}
+
+enum EventRecurrenceType {
+  none
+  weekly
+  monthly
+}
+
+enum FeaturedHighlightType {
+  event
+  offer
+  restaurant
+}
+
+enum RestaurantSupportMessageRole {
+  user
+  assistant
+}
+
+enum RestaurantReviewVisibilityStatus {
+  visible
+  removed
+}
+
+enum RestaurantReviewReportReason {
+  fake_or_no_visit
+  abusive_or_inappropriate
+  wrong_restaurant
+  privacy
+  other
+}
+
+enum RestaurantReviewReportStatus {
+  pending
+  kept
+  removed
+}
+
 model Restaurant {
   id           String     @id @default(uuid())
   name         String
@@ -59,6 +110,15 @@ model Restaurant {
 
   offers       Offer[]
   orders       Order[]
+  reviews      RestaurantReview[]
+  reviewReports RestaurantReviewReport[]
+  events       Event[]
+  eventFollowers EventProviderFollow[]
+  cateringOffers CateringOffer[]
+  menuViews    RestaurantMenuView[]
+  contentViews RestaurantContentView[]
+  supportConversation RestaurantSupportConversation?
+  featuredHighlights FeaturedHighlight[]
 }
 
 model Offer {
@@ -78,6 +138,7 @@ model Offer {
   updatedAt       DateTime  @updatedAt
 
   orders          Order[]
+  featuredHighlights FeaturedHighlight[]
 
   @@index([restaurantId])
 }
@@ -96,10 +157,265 @@ model Order {
   deviceId        String?
   requestIp       String?
   status          OrderStatus     @default(pending)
+  statusUpdatedAt DateTime?
+  archivedAt      DateTime?
   createdAt       DateTime        @default(now())
 
   @@index([restaurantId])
   @@index([offerId])
   @@index([restaurantId, customerEmail])
   @@index([restaurantId, deviceId])
+  @@index([restaurantId, archivedAt])
+}
+
+model AdminAccount {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model RestaurantReview {
+  id               String                  @id @default(uuid())
+  restaurantId     String
+  restaurant       Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  rating           Int
+  text             String
+  authorName       String?
+  deviceId         String?
+  requestIp        String?
+  replyText        String?
+  replyCreatedAt   DateTime?
+  replyUpdatedAt   DateTime?
+  restaurantSeenAt DateTime?
+  visibilityStatus RestaurantReviewVisibilityStatus @default(visible)
+  moderatedAt      DateTime?
+  moderationNote   String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  images           RestaurantReviewImage[]
+  report           RestaurantReviewReport?
+
+  @@index([restaurantId, createdAt])
+  @@index([restaurantId, restaurantSeenAt])
+  @@index([restaurantId, visibilityStatus, createdAt])
+}
+
+model RestaurantReviewReport {
+  id                String                       @id @default(uuid())
+  reviewId          String                       @unique
+  review            RestaurantReview             @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  restaurantId      String
+  restaurant        Restaurant                   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  reason            RestaurantReviewReportReason
+  note              String?
+  status            RestaurantReviewReportStatus @default(pending)
+  reportedAt        DateTime                     @default(now())
+  resolvedAt        DateTime?
+  resolvedByAdminId String?
+  resolutionNote    String?
+  restoredAt        DateTime?
+  updatedAt         DateTime                     @updatedAt
+
+  @@index([status, reportedAt])
+  @@index([restaurantId, status])
+}
+
+model RestaurantReviewImage {
+  id        String           @id @default(uuid())
+  reviewId  String
+  review    RestaurantReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  url       String
+  mimeType  String
+  createdAt DateTime         @default(now())
+
+  @@index([reviewId])
+}
+
+model RestaurantMenuView {
+  id         String     @id @default(uuid())
+  restaurantId String
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuKind   String
+  dayKey     String
+  viewerHash String
+  createdAt  DateTime   @default(now())
+
+  @@unique([restaurantId, menuKind, dayKey, viewerHash])
+  @@index([restaurantId, menuKind, dayKey])
+}
+
+model RestaurantContentView {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  contentType  String
+  contentId    String
+  contentTitle String?
+  dayKey       String
+  viewerHash   String
+  createdAt    DateTime   @default(now())
+
+  @@unique([restaurantId, contentType, contentId, dayKey, viewerHash])
+  @@index([restaurantId, contentType, dayKey])
+}
+
+model RestaurantSupportConversation {
+  id           String                     @id @default(uuid())
+  restaurantId String                     @unique
+  restaurant   Restaurant                 @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+
+  messages     RestaurantSupportMessage[]
+}
+
+model RestaurantSupportMessage {
+  id              String                       @id @default(uuid())
+  conversationId  String
+  conversation    RestaurantSupportConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role            RestaurantSupportMessageRole
+  content         String
+  title           String?
+  stepsJson       String?
+  actionTarget    String?
+  actionLabel     String?
+  handoffSuggested Boolean                    @default(false)
+  createdAt       DateTime                     @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([role, createdAt])
+}
+
+model SupportKnowledgeArticle {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  keywords  String
+  content   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id           String     @id @default(uuid())
+  providerId   String
+  provider     Restaurant @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  title        String
+  description  String
+  tags         EventTag[]
+  primaryTag   EventTag
+  venueName    String
+  address      String
+  postalCode   String
+  lat          Float
+  lng          Float
+  startAt      DateTime
+  endAt        DateTime
+  recurrenceType EventRecurrenceType @default(none)
+  recurrenceWeekdays String[] @default([])
+  recurrenceEndAt DateTime?
+  socialLinks   Json       @default("[]")
+  imageUrl     String?
+  ticketUrl    String?
+  contactUrl   String?
+  contactEmail String?
+  contactPhone String?
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  occurrenceCancellations EventOccurrenceCancellation[]
+  scheduledOccurrences    EventScheduledOccurrence[]
+  featuredHighlights      FeaturedHighlight[]
+
+  @@index([providerId])
+  @@index([startAt])
+  @@index([endAt])
+  @@index([active, startAt])
+  @@index([recurrenceType])
+  @@index([recurrenceEndAt])
+}
+
+model FeaturedHighlight {
+  id             String                @id @default(uuid())
+  type           FeaturedHighlightType
+  eventId        String?               @unique
+  event          Event?                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  offerId        String?               @unique
+  offer          Offer?                @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  restaurantId   String?               @unique
+  restaurant     Restaurant?           @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customImageUrl String?
+  active         Boolean               @default(true)
+  sortOrder      Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([active, sortOrder])
+  @@index([type])
+}
+
+model EventScheduledOccurrence {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  startAt   DateTime
+  endAt     DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([eventId, startAt])
+  @@index([eventId, startAt])
+  @@index([startAt, endAt])
+}
+
+model EventProviderFollow {
+  id         String     @id @default(uuid())
+  providerId String
+  provider   Restaurant @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  deviceHash String
+  pushToken  String
+  platform   String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@unique([providerId, deviceHash])
+  @@index([providerId])
+  @@index([pushToken])
+}
+
+model EventOccurrenceCancellation {
+  id                String   @id @default(uuid())
+  eventId           String
+  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  occurrenceStartAt DateTime
+  reason            String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([eventId, occurrenceStartAt])
+  @@index([eventId, occurrenceStartAt])
+}
+
+model CateringOffer {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  title        String
+  description  String
+  price        Decimal?  @db.Decimal(10, 2)
+  imageUrls    String[]  @default([])
+  active       Boolean   @default(true)
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([restaurantId, active, sortOrder])
 }

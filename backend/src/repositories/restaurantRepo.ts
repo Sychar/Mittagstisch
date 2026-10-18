@@ -9,11 +9,25 @@ export interface RestaurantRepo {
   updateMenu(
     id: string,
     patch: {
-      menuUrl?: string;
-      menuMimeType?: string;
+      menuUrl?: string | null;
+      menuMimeType?: string | null;
     }
   ): Promise<Restaurant | undefined>;
   updateMealSlots(id: string, mealSlots: MealSlot[]): Promise<Restaurant | undefined>;
+  updateProfile(
+    id: string,
+    patch: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      postalCode?: string;
+      lat?: number;
+      lng?: number;
+      mealSlots?: MealSlot[];
+    }
+  ): Promise<Restaurant | undefined>;
+  updatePassword(id: string, passwordHash: string): Promise<Restaurant | undefined>;
   updateApproval(
     id: string,
     patch: {
@@ -54,16 +68,16 @@ export class InMemoryRestaurantRepo implements RestaurantRepo {
   async updateMenu(
     id: string,
     patch: {
-      menuUrl?: string;
-      menuMimeType?: string;
+      menuUrl?: string | null;
+      menuMimeType?: string | null;
     }
   ): Promise<Restaurant | undefined> {
     const current = this.items.get(id);
     if (!current) return undefined;
     const next: Restaurant = {
       ...current,
-      menuUrl: patch.menuUrl,
-      menuMimeType: patch.menuMimeType
+      menuUrl: patch.menuUrl === null ? undefined : patch.menuUrl,
+      menuMimeType: patch.menuMimeType === null ? undefined : patch.menuMimeType
     };
     this.items.set(id, next);
     return next;
@@ -75,6 +89,40 @@ export class InMemoryRestaurantRepo implements RestaurantRepo {
     const next: Restaurant = {
       ...current,
       mealSlots
+    };
+    this.items.set(id, next);
+    return next;
+  }
+
+  async updateProfile(
+    id: string,
+    patch: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      postalCode?: string;
+      lat?: number;
+      lng?: number;
+      mealSlots?: MealSlot[];
+    }
+  ): Promise<Restaurant | undefined> {
+    const current = this.items.get(id);
+    if (!current) return undefined;
+    const next: Restaurant = {
+      ...current,
+      ...patch
+    };
+    this.items.set(id, next);
+    return next;
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<Restaurant | undefined> {
+    const current = this.items.get(id);
+    if (!current) return undefined;
+    const next: Restaurant = {
+      ...current,
+      passwordHash
     };
     this.items.set(id, next);
     return next;

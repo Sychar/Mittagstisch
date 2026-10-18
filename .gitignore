@@ -24,6 +24,7 @@ mobile/.expo/
 
 # logs
 *.log
+backend/logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -38,5 +39,16 @@ Thumbs.db
 # local runtime data
 backend/uploads/
 backend/.npm-cache/
+backend/.playwright-browsers/
 **/.npm-cache/
 mobile/.git.localbackup/
+
+# generated iOS previews
+mobile/dist-ios-preview*/
+
+# private server configuration and database backups
+backend/ENV_VISIBLE
+backend/backups/
+
+# unused local source video (over GitHub file size limit)
+/assets/WhatsApp Video 2026-10-06 at 21.52.30.mp4

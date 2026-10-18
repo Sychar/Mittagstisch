@@ -6,6 +6,7 @@ export interface OfferRepo {
   listByRestaurant(restaurantId: string): Promise<Offer[]>;
   create(offer: Offer): Promise<Offer>;
   update(id: string, patch: Partial<Offer>): Promise<Offer | undefined>;
+  delete(id: string): Promise<boolean>;
 }
 
 export class InMemoryOfferRepo implements OfferRepo {
@@ -36,5 +37,9 @@ export class InMemoryOfferRepo implements OfferRepo {
     const next: Offer = { ...current, ...patch };
     this.items.set(id, next);
     return next;
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.items.delete(id);
   }
 }

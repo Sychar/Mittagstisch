@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "A3M99YXX7Q.jetzt.mymittagstisch.app"
+        ],
+        "components": [
+          {
+            "/": "/events/*",
+            "comment": "Open shared Nah&Fein events in the iOS app"
+          },
+          {
+            "/": "/offers/*",
+            "comment": "Open shared Nah&Fein offers in the iOS app"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,13 +1,14 @@
-# Web Deployment (app + api)
+# Web Deployment (app + api + admin)
 
-Dieses Projekt kann als Web-App und API unter zwei Subdomains laufen:
+Dieses Projekt kann als Web-App und API unter drei Subdomains laufen:
 
 - `https://app.deinedomain.de` -> Expo Web Build (statisch)
 - `https://api.deinedomain.de` -> Fastify Backend (Node + PM2)
+- `https://admin.deinedomain.de` -> Statisches Admin-Frontend (`admin.html`)
 
 ## 1) Voraussetzungen (Ubuntu VPS)
 
-- DNS zeigt `app` und `api` auf deinen Server.
+- DNS zeigt `app`, `api` und `admin` auf deinen Server.
 - Ubuntu 22.04/24.04
 - `git`, `nginx`, `certbot`, `python3-certbot-nginx`, Node.js 20 LTS, `npm`, `pm2`, PostgreSQL erreichbar
 
@@ -44,6 +45,9 @@ Pflichtwerte in `backend/.env`:
 - `PUBLIC_BASE_URL=https://api.deinedomain.de`
 - `HOST=127.0.0.1`
 - `PORT=4000`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `REGISTRATION_NOTIFY_EMAIL` (optional, Default: `info@bundle.jetzt`)
 
 Dann deployen:
 
@@ -75,14 +79,17 @@ Vorlagen:
 
 - `deploy/nginx/app.conf`
 - `deploy/nginx/api.conf`
+- `deploy/nginx/admin.conf`
 
 Empfohlen:
 
 ```bash
 sudo cp deploy/nginx/app.conf /etc/nginx/sites-available/app.deinedomain.de
 sudo cp deploy/nginx/api.conf /etc/nginx/sites-available/api.deinedomain.de
+sudo cp deploy/nginx/admin.conf /etc/nginx/sites-available/admin.deinedomain.de
 sudo ln -s /etc/nginx/sites-available/app.deinedomain.de /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/api.deinedomain.de /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/admin.deinedomain.de /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -90,7 +97,7 @@ sudo systemctl reload nginx
 Dann TLS:
 
 ```bash
-sudo certbot --nginx -d app.deinedomain.de -d api.deinedomain.de
+sudo certbot --nginx -d app.deinedomain.de -d api.deinedomain.de -d admin.deinedomain.de
 ```
 
 ## 6) PM2 Autostart
@@ -107,14 +114,24 @@ cd /srv/mittagstisch
 git pull
 bash deploy/server/deploy-api.sh
 EXPO_PUBLIC_API_URL=https://api.deinedomain.de bash deploy/server/deploy-web.sh
+bash deploy/server/deploy-admin.sh
 sudo systemctl reload nginx
 ```
 
 ## 8) Abnahme
 
 - `https://app.deinedomain.de` lädt auf Desktop + Mobile.
+- `https://admin.deinedomain.de` lädt den Admin-Bereich.
 - Login, Angebote, Reservierung funktionieren.
 - Digitales Menü (OpenAI) funktioniert.
 - `https://api.deinedomain.de/health` antwortet mit `ok`.
 - Keine Mixed-Content/CORS-Fehler.
 - Nach Server-Neustart bleibt API über PM2 online.
+
+
+## 9) Deploy :
+- npx eas-cli@latest build --platform ios --profile production
+- npx eas-cli@latest submit --platform ios --latest --profile production --non-interactive
+- npx eas-cli@latest credentials --platform android
+- npx eas-cli@latest build --platform android --profile production --non-interactive
+- npx eas-cli@latest submit --platform android --latest --profile production --non-interactive

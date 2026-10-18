@@ -1,0 +1,17 @@
+Copyright (c)
+
+Alle Rechte vorbehalten.
+
+Diese Software sowie der gesamte Quellcode, die Dokumentation und alle
+zugehörigen Dateien (zusammen „Software“) sind Eigentum von Sakhr Aljendi.
+
+Jegliche Nutzung, Vervielfältigung, Veränderung, Weitergabe oder
+Veröffentlichung – ganz oder teilweise – ist ohne vorherige schriftliche
+Genehmigung ausdrücklich untersagt.
+
+Die Software wird „wie sie ist“ bereitgestellt, ohne jegliche Garantie,
+weder ausdrücklich noch stillschweigend, einschließlich der Garantie
+der Marktgängigkeit oder Eignung für einen bestimmten Zweck.
+
+Sakhr Aljendi haftet in keinem Fall für Schäden, die aus der Nutzung
+der Software entstehen.

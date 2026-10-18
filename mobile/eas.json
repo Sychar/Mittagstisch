@@ -1,0 +1,70 @@
+{
+  "cli": {
+    "version": ">= 18.4.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.nahundfein.com",
+        "EXPO_PUBLIC_WEBSITE_SYNC_API_URL": "https://preview-api.nahundfein.com",
+        "EXPO_PUBLIC_EVENTS_ENABLED": "1",
+        "EXPO_PUBLIC_WEBSITE_SYNC_ENABLED": "1",
+        "EXPO_PUBLIC_CATERING_ENABLED": "1",
+        "EXPO_PUBLIC_REVIEW_REPORTING_ENABLED": "1",
+        "EXPO_PUBLIC_DISCOVERY_HOME_ENABLED": "1",
+        "EXPO_APP_VERSION_OVERRIDE": "1.0.8"
+      },
+      "channel": "preview"
+    },
+    "testflight-preview": {
+      "autoIncrement": true,
+      "distribution": "store",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.nahundfein.com",
+        "EXPO_PUBLIC_WEBSITE_SYNC_API_URL": "https://preview-api.nahundfein.com",
+        "EXPO_PUBLIC_EVENTS_ENABLED": "1",
+        "EXPO_PUBLIC_WEBSITE_SYNC_ENABLED": "1",
+        "EXPO_PUBLIC_CATERING_ENABLED": "1",
+        "EXPO_PUBLIC_REVIEW_REPORTING_ENABLED": "1",
+        "EXPO_PUBLIC_DISCOVERY_HOME_ENABLED": "1",
+        "EXPO_APP_VERSION_OVERRIDE": "1.0.8"
+      },
+      "channel": "preview"
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.nahundfein.com",
+        "EXPO_PUBLIC_EVENTS_ENABLED": "1",
+        "EXPO_PUBLIC_WEBSITE_SYNC_ENABLED": "0",
+        "EXPO_PUBLIC_CATERING_ENABLED": "0",
+        "EXPO_PUBLIC_REVIEW_REPORTING_ENABLED": "0",
+        "EXPO_PUBLIC_DISCOVERY_HOME_ENABLED": "0",
+        "EXPO_APP_VERSION_OVERRIDE": "1.0.8"
+      },
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "preview": {
+      "ios": {
+        "ascAppId": "6760928415"
+      }
+    },
+    "production": {
+      "ios": {
+        "ascAppId": "6760928415"
+      },
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
+}

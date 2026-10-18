@@ -99,6 +99,30 @@ export class OfferService {
     };
   }
 
+  /** Public links must never reveal inactive offers or pending restaurants. */
+  async getPublicOfferWithRestaurant(id: string): Promise<OfferWithRestaurant | null> {
+    const offer = await this.offerRepo.findById(id);
+    if (!offer || !offer.active) return null;
+
+    const restaurant = await this.restaurantRepo.findById(offer.restaurantId);
+    if (!restaurant || restaurant.approvalStatus !== "approved") return null;
+
+    return {
+      ...offer,
+      distanceKm: 0,
+      restaurant: {
+        id: restaurant.id,
+        name: restaurant.name,
+        address: restaurant.address,
+        phone: restaurant.phone,
+        postalCode: restaurant.postalCode,
+        mealSlots: restaurant.mealSlots,
+        menuUrl: restaurant.menuUrl,
+        menuMimeType: restaurant.menuMimeType
+      }
+    };
+  }
+
   async createOffer(input: {
     restaurantId: string;
     title: string;
@@ -188,5 +212,20 @@ export class OfferService {
     }
 
     return updated;
+  }
+
+  async deleteOffer(restaurantId: string, offerId: string): Promise<void> {
+    const existing = await this.offerRepo.findById(offerId);
+    if (!existing) {
+      throw new Error("OFFER_NOT_FOUND");
+    }
+    if (existing.restaurantId !== restaurantId) {
+      throw new Error("FORBIDDEN");
+    }
+
+    const deleted = await this.offerRepo.delete(offerId);
+    if (!deleted) {
+      throw new Error("OFFER_NOT_FOUND");
+    }
   }
 }

@@ -4,35 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#e05a2b" />
-  <meta name="description" content="Mittagstisch Finder - Angebote in deiner Nähe." />
+  <meta name="description" content="Nah&Fein - Angebote in deiner Nähe." />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/icons/Icon33.jpeg" />
   <link rel="apple-touch-icon" href="assets/icons/Icon33.jpeg" />
   <link rel="stylesheet" href="assets/app.css" />
-  <title>Mittagstisch Finder</title>
+  <title>Nah&Fein</title>
 </head>
 <body>
   <div class="app-shell">
     <div class="topbar">
       <div class="brand">
         <div class="brand-mark">
-          <img src="assets/icons/Icon33.jpeg" alt="Mittagstisch Finder Icon" />
+          <img src="assets/icons/Icon33.jpeg" alt="Nah&Fein Icon" />
         </div>
-        <span>Mittagstisch Finder</span>
+        <span>Nah&Fein</span>
       </div>
       <div class="nav-links">
-        <a class="nav-pill" href="user.html">User</a>
-        <a class="nav-pill" href="restaurant.html">Restaurant</a>
-        <a class="nav-pill" href="admin.html">Admin</a>
+        <a class="nav-pill" href="https://app.nahundfein.com">🍽️ Jetzt loslegen</a>
       </div>
     </div>
 
     <section class="hero">
       <div class="hero-copy">
-        <div class="pill">Mittagstisch Finder</div>
-        <h1>Dein Mittagstisch in der Nähe. Schnell. Ohne Stress.</h1>
+        <div class="pill">Nah&Fein</div>
+        <h1>Dein Essen in der Nähe. Schnell. Ohne Stress.</h1>
         <p>
-          Mittagstisch Finder bringt die Tagesgerichte aus deiner Umgebung direkt
+          <strong>Sogar ohne Anmeldung.</strong><br />
+          Nah&Fein bringt die Tagesgerichte aus deiner Umgebung direkt
           auf dein Handy. Keine Anmeldung für Nutzer, einfach Postleitzahl eingeben
           und wie bei Instagram durch die Angebote scrollen.
         </p>
@@ -40,15 +39,16 @@
           <span class="badge">10 km Umkreis</span>
           <span class="badge">Vegan & Vegetarisch Filter</span>
           <span class="badge">Restaurant-Uploads in Minuten</span>
+          <span class="badge">App sowie Webseite verfügbar</span>
         </div>
         <div class="stat-grid">
           <div class="stat">
-            <strong>2.4k+</strong>
-            <span>aktive User</span>
+            <strong>Lokal unterstützen</strong>
+            <span>Direkt vor Ort</span>
           </div>
           <div class="stat">
-            <strong>140+</strong>
-            <span>Restaurants</span>
+            <strong>Was Neues probieren</strong>
+            <span>Heute etwas anderes</span>
           </div>
           <div class="stat">
             <strong>10 min</strong>
@@ -149,34 +149,139 @@
       <div>
         <h2 class="section-title">App-Download</h2>
         <p class="qr-text">
-          Scanne den QR Code und lade die App direkt aus dem Store. Sobald der
-          echte Store-Link feststeht, wird der QR Code aktualisiert.
+          Scanne den QR Code und lade die App direkt aus dem Store. Alternativ
+          kannst du die direkten Store-Links unten verwenden oder direkt auf den
+          QR Code tippen.
         </p>
       </div>
       <div class="qr-grid">
         <div class="qr-card">
           <div class="qr-code">
-            <img src="assets/qr-appstore.png" alt="App Store QR Code" />
+            <a
+              class="qr-code-link"
+              href="https://apps.apple.com/de/app/nah-fein/id6760928415"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="App Store öffnen"
+            >
+              <img src="assets/qr-appstore.png?v=20260504-qr2" alt="App Store QR Code" />
+            </a>
           </div>
           <div>
             <strong>App Store</strong>
             <p class="qr-label">iOS-Download</p>
+            <a
+              class="qr-store-link"
+              href="https://apps.apple.com/de/app/nah-fein/id6760928415"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Zum Apple App Store
+            </a>
           </div>
         </div>
         <div class="qr-card">
           <div class="qr-code">
-            <img src="assets/qr-playstore.png" alt="Google Play QR Code" />
+            <a
+              class="qr-code-link"
+              href="https://play.google.com/store/apps/details?id=jetzt.mymittagstisch.app&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Google Play öffnen"
+            >
+              <img src="assets/qr-playstore.png?v=20260504-qr2" alt="Google Play QR Code" />
+            </a>
           </div>
           <div>
             <strong>Google Play</strong>
             <p class="qr-label">Android-Download</p>
+            <a
+              class="qr-store-link"
+              href="https://play.google.com/store/apps/details?id=jetzt.mymittagstisch.app&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Zum Google Play Store
+            </a>
           </div>
         </div>
       </div>
     </section>
+
+    <footer class="home-footer" aria-label="Footer">
+      <div class="footer-main">
+        <div class="footer-brand-col">
+          <p class="footer-brand">Nah&Fein</p>
+          <p class="footer-description">
+            Deine Community fuer lokale Mittagsangebote in deiner Naehe.
+          </p>
+          <div class="footer-social-row" aria-label="Social">
+            <a
+              class="footer-social-chip"
+              href="https://www.instagram.com/nah_und_fein/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Quick Links</h3>
+          <a class="footer-nav-link" href="https://app.nahundfein.com">User</a>
+          <a class="footer-nav-link" href="https://app.nahundfein.com">Restaurant</a>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Kontakt</h3>
+          <p class="footer-contact-line">Tel: +49 177 1544169</p>
+          <p class="footer-contact-line">E-Mail: info@bundle.jetzt</p>
+          <p class="footer-contact-line">Ort: Ravensburg Gartenstraße 63</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          <a
+            class="footer-copyright-link"
+            href="https://home.nahundfein.com/copyright/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Copyright (c)
+          </a>
+        </p>
+        <div class="footer-legal-links">
+          <a
+            class="footer-legal-link"
+            href="https://home.nahundfein.com/datenschutz/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Datenschutz
+          </a>
+          <a
+            class="footer-legal-link"
+            href="https://home.nahundfein.com/agb/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            AGB
+          </a>
+          <a
+            class="footer-legal-link"
+            href="https://bundle.jetzt/impressum"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Impressum
+          </a>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <script src="assets/app.js"></script>
 </body>
 </html>
-

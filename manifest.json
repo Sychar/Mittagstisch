@@ -1,6 +1,6 @@
 ﻿{
-  "name": "Mittagstisch Finder",
-  "short_name": "Mittagstisch",
+  "name": "Nah&Fein",
+  "short_name": "Nah&Fein",
   "start_url": "./user.html",
   "scope": "./",
   "display": "standalone",

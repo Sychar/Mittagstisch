@@ -14,6 +14,8 @@ const toOrder = (row: DbOrder): Order => ({
   deviceId: row.deviceId ?? undefined,
   requestIp: row.requestIp ?? undefined,
   status: row.status,
+  statusUpdatedAt: row.statusUpdatedAt?.toISOString() ?? undefined,
+  archivedAt: row.archivedAt?.toISOString() ?? undefined,
   createdAt: row.createdAt.toISOString()
 });
 
@@ -27,7 +29,10 @@ export class PrismaOrderRepo implements OrderRepo {
 
   async listByRestaurant(restaurantId: string): Promise<Order[]> {
     const rows = await this.prisma.order.findMany({
-      where: { restaurantId },
+      where: {
+        restaurantId,
+        archivedAt: null
+      },
       orderBy: { createdAt: 'desc' }
     });
     return rows.map(toOrder);
@@ -47,6 +52,8 @@ export class PrismaOrderRepo implements OrderRepo {
         deviceId: order.deviceId ?? null,
         requestIp: order.requestIp ?? null,
         status: order.status,
+        statusUpdatedAt: order.statusUpdatedAt ? new Date(order.statusUpdatedAt) : null,
+        archivedAt: order.archivedAt ? new Date(order.archivedAt) : null,
         createdAt: new Date(order.createdAt)
       }
     });
@@ -54,11 +61,32 @@ export class PrismaOrderRepo implements OrderRepo {
     return toOrder(row);
   }
 
-  async updateStatus(id: string, status: Order["status"]): Promise<Order | undefined> {
+  async updateStatus(
+    id: string,
+    status: Order["status"],
+    statusUpdatedAt?: string
+  ): Promise<Order | undefined> {
     try {
       const row = await this.prisma.order.update({
         where: { id },
-        data: { status }
+        data: {
+          status,
+          statusUpdatedAt: statusUpdatedAt ? new Date(statusUpdatedAt) : undefined
+        }
+      });
+      return toOrder(row);
+    } catch {
+      return undefined;
+    }
+  }
+
+  async archive(id: string, archivedAt: string): Promise<Order | undefined> {
+    try {
+      const row = await this.prisma.order.update({
+        where: { id },
+        data: {
+          archivedAt: new Date(archivedAt)
+        }
       });
       return toOrder(row);
     } catch {

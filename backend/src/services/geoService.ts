@@ -8,8 +8,90 @@ const postalCodeMap: Record<string, Coordinates> = {
 };
 
 export class GeoService {
+  private geocodeCache = new Map<string, Coordinates>();
+
   getCoordinates(postalCode: string): Coordinates | null {
     return postalCodeMap[postalCode] ?? null;
+  }
+
+  async resolveSearchCoordinates(searchText: string): Promise<Coordinates | null> {
+    const query = String(searchText || "").trim();
+    if (!query) return null;
+
+    const byKnownPostalCode = this.getCoordinates(query);
+    if (byKnownPostalCode) return byKnownPostalCode;
+
+    return await this.lookupGenericCoordinates(`${query}, Deutschland`);
+  }
+
+  async resolveRestaurantCoordinates(input: {
+    address: string;
+    postalCode: string;
+    lat?: number;
+    lng?: number;
+  }): Promise<Coordinates | null> {
+    const lat = Number(input.lat);
+    const lng = Number(input.lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      return { lat, lng };
+    }
+
+    const byAddress = await this.lookupAddressCoordinates(input.address, input.postalCode);
+    if (byAddress) return byAddress;
+
+    return this.getCoordinates(input.postalCode);
+  }
+
+  private async lookupAddressCoordinates(
+    address: string,
+    postalCode: string
+  ): Promise<Coordinates | null> {
+    const query = `${address}, ${postalCode}, Deutschland`.trim();
+    return await this.lookupGenericCoordinates(query);
+  }
+
+  private async lookupGenericCoordinates(query: string): Promise<Coordinates | null> {
+    const trimmed = query.trim();
+    if (!trimmed) return null;
+
+    const cached = this.geocodeCache.get(trimmed);
+    if (cached) return cached;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+
+    try {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("format", "jsonv2");
+      url.searchParams.set("limit", "1");
+      url.searchParams.set("countrycodes", "de");
+      url.searchParams.set("q", trimmed);
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "User-Agent": "mittagstisch/1.0 (+admin@bundle.jetzt)",
+          Accept: "application/json"
+        },
+        signal: controller.signal
+      });
+
+      if (!response.ok) return null;
+
+      const payload = (await response.json()) as Array<{ lat?: string; lon?: string }>;
+      const first = payload?.[0];
+      const lat = Number(first?.lat);
+      const lng = Number(first?.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+      const coordinates = { lat, lng };
+      this.geocodeCache.set(trimmed, coordinates);
+      return coordinates;
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 }
 

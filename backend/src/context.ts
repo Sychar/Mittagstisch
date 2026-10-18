@@ -1,27 +1,44 @@
-﻿import { seedOffers, seedRestaurants } from "./data/seed";
+﻿import { PrismaClient } from "@prisma/client";
+import { seedOffers, seedRestaurants } from "./data/seed";
+import { AdminRepo, InMemoryAdminRepo } from "./repositories/adminRepo";
 import { InMemoryOfferRepo, OfferRepo } from "./repositories/offerRepo";
 import { InMemoryOrderRepo, OrderRepo } from "./repositories/orderRepo";
 import { InMemoryRestaurantRepo, RestaurantRepo } from "./repositories/restaurantRepo";
-import { InMemorySessionRepo } from "./repositories/sessionRepo";
+import { InMemorySessionRepo, SessionRepo } from "./repositories/sessionRepo";
+import { PrismaAdminRepo } from "./repositories/prismaAdminRepo";
 import { createPrismaClient } from "./repositories/prismaClient";
 import { PrismaOfferRepo } from "./repositories/prismaOfferRepo";
 import { PrismaOrderRepo } from "./repositories/prismaOrderRepo";
 import { PrismaRestaurantRepo } from "./repositories/prismaRestaurantRepo";
+import { AdminService } from "./services/adminService";
+import { EmailService } from "./services/emailService";
 import { GeoService } from "./services/geoService";
 import { OfferService } from "./services/offerService";
 import { OrderService } from "./services/orderService";
 import { OrderSpamGuard } from "./services/orderSpamGuard";
+import { PasswordResetStore } from "./services/passwordResetStore";
+import { PushService } from "./services/pushService";
 import { RestaurantService } from "./services/restaurantService";
+import { SupportChatService } from "./services/supportChatService";
+import { WebsiteSyncService } from "./services/websiteSyncService";
 
 export type AppContext = {
+  prisma: PrismaClient | null;
+  adminService: AdminService;
+  adminRepo: AdminRepo;
   offerService: OfferService;
   orderService: OrderService;
   restaurantService: RestaurantService;
   offerRepo: OfferRepo;
   orderRepo: OrderRepo;
   restaurantRepo: RestaurantRepo;
-  sessionRepo: InMemorySessionRepo;
+  sessionRepo: SessionRepo;
   geoService: GeoService;
+  emailService: EmailService;
+  passwordResetStore: PasswordResetStore;
+  pushService: PushService;
+  supportChatService: SupportChatService;
+  websiteSyncService: WebsiteSyncService;
 };
 
 export const buildContext = async (): Promise<AppContext> => {
@@ -46,6 +63,9 @@ export const buildContext = async (): Promise<AppContext> => {
   const offerRepo: OfferRepo = usePrisma && prisma
     ? new PrismaOfferRepo(prisma)
     : new InMemoryOfferRepo();
+  const adminRepo: AdminRepo = usePrisma && prisma
+    ? new PrismaAdminRepo(prisma)
+    : new InMemoryAdminRepo();
   const orderRepo: OrderRepo = usePrisma && prisma
     ? new PrismaOrderRepo(prisma)
     : new InMemoryOrderRepo();
@@ -56,6 +76,12 @@ export const buildContext = async (): Promise<AppContext> => {
   const sessionRepo = new InMemorySessionRepo();
   const geoService = new GeoService();
   const orderSpamGuard = new OrderSpamGuard();
+  const emailService = new EmailService();
+  const passwordResetStore = new PasswordResetStore();
+  const pushService = new PushService();
+  const supportChatService = new SupportChatService(prisma);
+  const websiteSyncService = new WebsiteSyncService();
+  const adminService = new AdminService(adminRepo);
 
   if (shouldSeed) {
     if (!usePrisma) {
@@ -87,8 +113,12 @@ export const buildContext = async (): Promise<AppContext> => {
     sessionRepo,
     geoService
   );
+  await adminService.bootstrapFromEnv();
 
   return {
+    prisma,
+    adminService,
+    adminRepo,
     offerService,
     orderService,
     restaurantService,
@@ -96,6 +126,11 @@ export const buildContext = async (): Promise<AppContext> => {
     orderRepo,
     restaurantRepo,
     sessionRepo,
-    geoService
+    geoService,
+    emailService,
+    passwordResetStore,
+    pushService,
+    supportChatService,
+    websiteSyncService
   };
 };

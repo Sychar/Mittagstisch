@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/icons/Icon33.jpeg" />
   <link rel="apple-touch-icon" href="assets/icons/Icon33.jpeg" />
-  <link rel="stylesheet" href="assets/app.css" />
+  <link rel="stylesheet" href="assets/app.css?v=20261001-review-moderation" />
   <title>Admin - Mittagstisch Finder</title>
 </head>
 <body>
@@ -43,7 +43,7 @@
         </div>
         <button class="button" type="submit">Als Admin einloggen</button>
       </form>
-      <div class="notice subtle">Standard Demo Admin: admin@mittagstisch.de / admin123</div>
+      <div class="notice subtle">Admin-Zugangsdaten werden serverseitig konfiguriert.</div>
       <div class="notice warn hidden" data-admin-login-error></div>
     </div>
 
@@ -63,14 +63,105 @@
           <button class="button ghost" type="button" data-admin-logout>Abmelden</button>
         </div>
       </div>
+      <details class="form-panel admin-password-accordion">
+        <summary class="admin-password-summary">Admin-Passwort ändern</summary>
+        <div class="admin-password-content">
+          <form data-admin-password-form>
+            <div class="field">
+              <label for="adminCurrentPassword">Aktuelles Passwort</label>
+              <input
+                id="adminCurrentPassword"
+                name="adminCurrentPassword"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="adminNewPassword">Neues Passwort</label>
+              <input
+                id="adminNewPassword"
+                name="adminNewPassword"
+                type="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="adminNewPasswordRepeat">Neues Passwort wiederholen</label>
+              <input
+                id="adminNewPasswordRepeat"
+                name="adminNewPasswordRepeat"
+                type="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              />
+            </div>
+            <button class="button" type="submit">Passwort ändern</button>
+          </form>
+          <div class="notice hidden" data-admin-password-status></div>
+        </div>
+      </details>
 
       <div class="notice subtle" data-admin-status>Bitte Status auswählen.</div>
       <div class="notice warn hidden" data-admin-error></div>
       <div class="list" data-admin-request-list></div>
+
+      <h2 class="section-title" id="review-reports">Gemeldete Bewertungen</h2>
+      <div class="form-panel admin-toolbar">
+        <div class="field">
+          <label for="reviewReportStatusFilter">Prüfstatus</label>
+          <select id="reviewReportStatusFilter" data-review-report-status-filter>
+            <option value="pending">Offen</option>
+            <option value="kept">Bleibt online</option>
+            <option value="removed">Entfernt</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <button class="button" type="button" data-review-report-refresh>Bewertungen aktualisieren</button>
+        </div>
+      </div>
+      <div class="notice subtle" data-review-report-status>Offene Meldungen werden geladen.</div>
+      <div class="notice warn hidden" data-review-report-error></div>
+      <div class="list" data-review-report-list></div>
+
+      <h2 class="section-title" id="preview-highlights">Preview-Highlights</h2>
+      <div class="notice subtle">
+        Diese Auswahl erscheint ausschließlich in der iOS-TestFlight-Preview. Production bleibt unverändert.
+      </div>
+      <div class="form-panel admin-highlight-toolbar">
+        <div class="field">
+          <label for="highlightCandidateType">Inhalt</label>
+          <select id="highlightCandidateType" data-highlight-candidate-type>
+            <option value="">Alle Inhalte</option>
+            <option value="event">Events</option>
+            <option value="offer">Angebote</option>
+            <option value="restaurant">Restaurants</option>
+          </select>
+        </div>
+        <div class="field admin-highlight-search-field">
+          <label for="highlightCandidateSearch">Suchen</label>
+          <input id="highlightCandidateSearch" data-highlight-candidate-search placeholder="Titel oder Anbieter" />
+        </div>
+        <button class="button" type="button" data-highlight-candidate-load>Inhalte suchen</button>
+      </div>
+      <div class="notice subtle" data-highlight-status>Highlights werden nach dem Login geladen.</div>
+      <div class="notice warn hidden" data-highlight-error></div>
+      <div class="admin-highlight-layout">
+        <section>
+          <h3>Verfügbare Inhalte</h3>
+          <div class="list" data-highlight-candidate-list></div>
+        </section>
+        <section>
+          <h3>Aktive Reihenfolge</h3>
+          <div class="list" data-highlight-list></div>
+        </section>
+      </div>
     </div>
   </div>
 
-  <script src="assets/admin.js"></script>
+  <script src="assets/admin.js?v=20261007-preview-highlights"></script>
 </body>
 </html>
-

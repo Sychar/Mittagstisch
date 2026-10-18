@@ -24,6 +24,12 @@ export const requireAuth = (
     throw new HttpError(401, "UNAUTHORIZED", "Invalid auth token");
   }
 
+  const expiresAtMs = Date.parse(session.expiresAt);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    sessionRepo.delete(token);
+    throw new HttpError(401, "UNAUTHORIZED", "Session expired");
+  }
+
   sessionRepo.touch(token);
   return session.restaurantId;
 };

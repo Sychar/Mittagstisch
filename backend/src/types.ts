@@ -1,4 +1,4 @@
-export type Tag = "vegan" | "vegetarian" | "classic";
+export type Tag = "vegan" | "vegetarian" | "classic" | "coffee" | "icecream";
 export type MealSlot = "breakfast" | "lunch" | "dinner";
 export type RestaurantApprovalStatus = "pending" | "approved" | "rejected";
 export type FulfillmentType = "pickup" | "dinein";
@@ -61,6 +61,8 @@ export type Order = {
   deviceId?: string;
   requestIp?: string;
   status: OrderStatus;
+  statusUpdatedAt?: string;
+  archivedAt?: string;
   createdAt: string;
 };
 
@@ -73,6 +75,17 @@ export type Session = {
   restaurantId: string;
   createdAt: string;
   lastSeenAt: string;
+  expiresAt: string;
+  rememberMe: boolean;
+};
+
+export type AdminAccount = {
+  id: string;
+  email: string;
+  passwordHash: string;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Coordinates = {

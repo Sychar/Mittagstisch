@@ -77,4 +77,13 @@ export class PrismaOfferRepo implements OfferRepo {
       return undefined;
     }
   }
+
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.offer.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }

@@ -1,0 +1,196 @@
+diff --git a/node_modules/expo-image-picker/ios/MediaHandler.swift b/node_modules/expo-image-picker/ios/MediaHandler.swift
+index 6e4fbe1..8148e4c 100644
+--- a/node_modules/expo-image-picker/ios/MediaHandler.swift
++++ b/node_modules/expo-image-picker/ios/MediaHandler.swift
+@@ -119,6 +119,15 @@ internal struct MediaHandler {
+ 
+   private func handleImage(from selectedImage: PHPickerResult) async throws -> AssetInfo {
+     let itemProvider = selectedImage.itemProvider
++    var readDiagnostics: [String] = []
++
++    // Prefer the Photos asset over NSItemProvider. The latter may fail to generate a
++    // JPEG/PNG representation for iCloud-backed images even after a user selected it.
++    let photoLibraryResult = await handleImageFromPhotoLibraryAsset(selectedImage)
++    if let assetInfo = photoLibraryResult.assetInfo {
++      return assetInfo
++    }
++    readDiagnostics.append(contentsOf: photoLibraryResult.diagnostics)
+ 
+     // Fast-path: copy original file when no processing is required and current representation is requested.
+     let fastPath =
+@@ -126,21 +135,23 @@ internal struct MediaHandler {
+       && options.preferredAssetRepresentationMode == .current
+ 
+     if fastPath {
+-      // Attempt to obtain original file URL
+-      if let targetUrl = try? await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<URL, Error>)
+-        in itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
+-          guard let srcUrl = url else {
+-            return continuation.resume(throwing: error ?? FailedToReadImageException())
+-          }
+-          do {
+-            let destUrl = try generateUrl(withFileExtension: "." + srcUrl.pathExtension)
+-            try FileManager.default.copyItem(at: srcUrl, to: destUrl)
+-            continuation.resume(returning: destUrl)
+-          } catch {
+-            continuation.resume(throwing: error)
++      do {
++        // Attempt to obtain original file URL.
++        let targetUrl = try await withCheckedThrowingContinuation {
++          (continuation: CheckedContinuation<URL, Error>) in
++          itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
++            guard let srcUrl = url else {
++              return continuation.resume(throwing: error ?? FailedToReadImageException())
++            }
++            do {
++              let destUrl = try generateUrl(withFileExtension: "." + srcUrl.pathExtension)
++              try FileManager.default.copyItem(at: srcUrl, to: destUrl)
++              continuation.resume(returning: destUrl)
++            } catch {
++              continuation.resume(throwing: error)
++            }
+           }
+         }
+-      }) {
+         let cachedUrl = targetUrl
+         let fileExtension = "." + cachedUrl.pathExtension
+ 
+@@ -169,12 +180,26 @@ internal struct MediaHandler {
+           base64: base64,
+           exif: exif
+         )
++      } catch {
++        readDiagnostics.append(describeImageReadError(stage: "ITEM_PROVIDER_FILE", error: error))
+       }
+     }
+ 
+     // If fast copy path failed or was not available because of the props
+     // use slow path (existing implementation)
+-    let rawData = try await itemProvider.loadImageDataRepresentation()
++    let rawData: Data
++    do {
++      rawData = try await itemProvider.loadImageDataRepresentation()
++    } catch {
++      readDiagnostics.append(describeImageReadError(stage: "ITEM_PROVIDER_DATA", error: error))
++      let details = readDiagnostics.joined(separator: " | ")
++      let diagnosticError = NSError(
++        domain: "ExpoImagePickerDiagnostics",
++        code: 1,
++        userInfo: [NSLocalizedDescriptionKey: details]
++      )
++      throw FailedToReadImageException().causedBy(diagnosticError)
++    }
+ 
+     guard let image = UIImage(data: rawData) else {
+       throw Exception(name: "FailedCreatingUIImage", description: "")
+@@ -212,6 +237,110 @@ internal struct MediaHandler {
+     )
+   }
+ 
++  private func handleImageFromPhotoLibraryAsset(
++    _ selectedImage: PHPickerResult
++  ) async -> (assetInfo: AssetInfo?, diagnostics: [String]) {
++    let authorization = photoLibraryAuthorizationDescription()
++    guard let assetId = selectedImage.assetIdentifier else {
++      return (nil, ["PHASSET_ASSET_ID_MISSING(auth=\(authorization))"])
++    }
++
++    let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
++    guard let asset = fetchResult.firstObject else {
++      return (nil, ["PHASSET_FETCH_EMPTY(auth=\(authorization))"])
++    }
++
++    let resources = PHAssetResource.assetResources(for: asset)
++    let preferredTypes: [PHAssetResourceType] = [
++      .fullSizePhoto,
++      .photo,
++      .adjustmentBasePhoto,
++      .alternatePhoto
++    ]
++    let orderedResources = preferredTypes.flatMap { preferredType in
++      resources.filter { $0.type == preferredType }
++    }
++    guard !orderedResources.isEmpty else {
++      let availableTypes = resources.map { String($0.type.rawValue) }.joined(separator: ",")
++      return (nil, ["PHASSET_NO_PHOTO_RESOURCE(types=\(availableTypes),auth=\(authorization))"])
++    }
++
++    let requestOptions = PHAssetResourceRequestOptions()
++    requestOptions.isNetworkAccessAllowed = true
++    var diagnostics: [String] = []
++
++    for resource in orderedResources {
++      let originalFilename = resource.originalFilename
++      let filenameExtension = getFileExtension(from: originalFilename)
++      let contentTypeExtension = UTType(resource.uniformTypeIdentifier)?.preferredFilenameExtension.map { ".\($0)" }
++      guard let fileExtension = filenameExtension != "." ? filenameExtension : contentTypeExtension else {
++        diagnostics.append("PHASSET_EXTENSION_MISSING(type=\(resource.type.rawValue))")
++        continue
++      }
++
++      do {
++        let targetUrl = try generateUrl(withFileExtension: fileExtension)
++        try await PHAssetResourceManager.default().writeData(
++          for: resource,
++          toFile: targetUrl,
++          options: requestOptions
++        )
++
++        let size = ImageUtils.readVisualSizeFrom(url: targetUrl) ?? .zero
++        let fileSize = getFileSize(from: targetUrl)
++        let mimeType = getMimeType(from: targetUrl.pathExtension)
++        var rawData: Data?
++        if options.base64 || options.exif {
++          rawData = try? Data(contentsOf: targetUrl)
++        }
++
++        return (
++          AssetInfo(
++            assetId: assetId,
++            uri: targetUrl.absoluteString,
++            width: Double(size.width),
++            height: Double(size.height),
++            fileName: originalFilename,
++            fileSize: fileSize,
++            mimeType: mimeType,
++            base64: options.base64 ? rawData?.base64EncodedString() : nil,
++            exif: options.exif ? rawData.flatMap { ImageUtils.readExifFrom(data: $0) } : nil
++          ),
++          diagnostics
++        )
++      } catch {
++        diagnostics.append(
++          describeImageReadError(stage: "PHASSET_RESOURCE_\(resource.type.rawValue)", error: error)
++        )
++      }
++    }
++
++    return (nil, diagnostics)
++  }
++
++  private func photoLibraryAuthorizationDescription() -> String {
++    switch PHPhotoLibrary.authorizationStatus(for: .readWrite) {
++    case .authorized:
++      return "authorized"
++    case .limited:
++      return "limited"
++    case .denied:
++      return "denied"
++    case .restricted:
++      return "restricted"
++    case .notDetermined:
++      return "notDetermined"
++    @unknown default:
++      return "unknown"
++    }
++  }
++
++  private func describeImageReadError(stage: String, error: Error) -> String {
++    let nativeError = error as NSError
++    let message = nativeError.localizedDescription.replacingOccurrences(of: "|", with: "/")
++    return "\(stage)(domain=\(nativeError.domain),code=\(nativeError.code),message=\(message))"
++  }
++
+   // Unlike the case of regular images, we have to operate on original data of the image in order to preserve the exif data,
+   // otherwise it won't be possible to connect the image and video into a `PHLivePhoto` after reading it from the cache directory later.
+   // As a result a live photo photo cannot be compressed or edited.

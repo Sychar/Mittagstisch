@@ -4,7 +4,12 @@ export interface OrderRepo {
   findById(id: string): Promise<Order | undefined>;
   listByRestaurant(restaurantId: string): Promise<Order[]>;
   create(order: Order): Promise<Order>;
-  updateStatus(id: string, status: Order["status"]): Promise<Order | undefined>;
+  updateStatus(
+    id: string,
+    status: Order["status"],
+    statusUpdatedAt?: string
+  ): Promise<Order | undefined>;
+  archive(id: string, archivedAt: string): Promise<Order | undefined>;
 }
 
 export class InMemoryOrderRepo implements OrderRepo {
@@ -16,7 +21,7 @@ export class InMemoryOrderRepo implements OrderRepo {
 
   async listByRestaurant(restaurantId: string): Promise<Order[]> {
     return Array.from(this.items.values())
-      .filter((order) => order.restaurantId === restaurantId)
+      .filter((order) => order.restaurantId === restaurantId && !order.archivedAt)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
@@ -25,10 +30,29 @@ export class InMemoryOrderRepo implements OrderRepo {
     return order;
   }
 
-  async updateStatus(id: string, status: Order["status"]): Promise<Order | undefined> {
+  async updateStatus(
+    id: string,
+    status: Order["status"],
+    statusUpdatedAt?: string
+  ): Promise<Order | undefined> {
     const current = this.items.get(id);
     if (!current) return undefined;
-    const next: Order = { ...current, status };
+    const next: Order = {
+      ...current,
+      status,
+      statusUpdatedAt: statusUpdatedAt ?? current.statusUpdatedAt
+    };
+    this.items.set(id, next);
+    return next;
+  }
+
+  async archive(id: string, archivedAt: string): Promise<Order | undefined> {
+    const current = this.items.get(id);
+    if (!current) return undefined;
+    const next: Order = {
+      ...current,
+      archivedAt
+    };
     this.items.set(id, next);
     return next;
   }

@@ -1,0 +1,2 @@
+ALTER TABLE "CateringOffer"
+ADD COLUMN "imageUrls" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
